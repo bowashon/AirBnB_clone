@@ -3,6 +3,8 @@
 saving data to file
 """
 import json
+import os
+from base_model import BaseModel
 
 
 class FileStorage:
@@ -29,8 +31,9 @@ class FileStorage:
         serialiaze __object to JSON file
         """
         obj_dict = {}
-        for key, value in FileStorage.__objects.items():
-            obj_dict[key] = value.to_dict()
+        all_obj = FileStorage.__objects
+        for key in FileStorage.__all_obj.keys():
+            obj_dict[key] = all_obj[key].to_dict()
 
         with open(FileStorage.__file_path, 'w') as file:
             json.dump(obj_dict, file)
@@ -40,13 +43,9 @@ class FileStorage:
         """
         deserialize the JSON file to __objects
         """
-        try:
+        if os.path.isFile(FileStorage.__file_path):
             with open(FileStorage.__file_path, 'r') as file:
-                obj_instance = json.load(file)
-                for key, value in obj_instance.items():
-                    cls_name, obj_id = key.split('.')
-                    cls = eval(cls_name)
-                    obj_instance = cls(**value)
-                    self.new(obj)
-        except FileNotFoundError:
-            pass
+                try:
+                    obj_dict = json.load(file)
+                    for key, value in obj_dict.items():
+                        class_name, class_id = key.split('.')
