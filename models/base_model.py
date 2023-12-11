@@ -24,7 +24,7 @@ class BaseModel:
         datetime
         """
         self.updated_at = datetime.utcnow()
-    
+
     def to_dict(self):
         """
         Returns dictionary containing all keys/values
