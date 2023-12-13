@@ -46,6 +46,16 @@ class HBNBCommand(cmd.Cmd):
     """
     prompt = "(hbnb) "
 
+    __classes = {
+            "User",
+            "BaseModel",
+            "Place",
+            "State",
+            "City",
+            "Amenity",
+            "Review"
+            }
+
     def do_quit(self, arg):
         """Quit command to exit the program"""
 
@@ -66,7 +76,7 @@ class HBNBCommand(cmd.Cmd):
         my_arg = pars(arg)
         if not my_arg:
             print("** class name missing **")
-        elif my_arg[0] not in storage.all().keys():
+        elif my_arg[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
         else:
             new_instance = eval(my_arg[0])()
@@ -82,7 +92,7 @@ class HBNBCommand(cmd.Cmd):
         obj_dict = storage.all()
         if len(my_arg) == 0:
             print("** class name missing **")
-        elif my_arg[0] not in storage.all().keys():
+        elif my_arg[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
         elif len(my_arg) == 1:
             print("** instance id missing **")
@@ -101,7 +111,7 @@ class HBNBCommand(cmd.Cmd):
         obj_dict = storage.all()
         if not my_arg:
             print("** class name missing **")
-        elif my_arg[0] not in storage.all().keys():
+        elif my_arg[0] not in  HBNBCommand.__classes:
             print("** class doesn't exist **")
         elif len(my_arg) < 2:
             print("** instance id missing **")
@@ -120,7 +130,7 @@ class HBNBCommand(cmd.Cmd):
         """
         my_arg = pars(arg)
         obj_dict = storage.all()
-        if not my_arg or my_arg[0] not in storage.all().keys():
+        if not my_arg or my_arg[0] not in  HBNBCommand.__classes:
             print("** class doesn't exist **")
         else:
             result_list = [str(obj) for key, obj in obj_dict.items() if
@@ -147,7 +157,7 @@ class HBNBCommand(cmd.Cmd):
         obj_dict = storage.all()
         if not my_arg:
             print("** class name missing **")
-        elif my_arg[0] not in storage.all().keys():
+        elif my_arg[0] not in  HBNBCommand.__classes:
             print("** class doesn't exist **")
         elif len(my_arg) < 2:
             print("** instance id missing **")

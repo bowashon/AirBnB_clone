@@ -4,6 +4,12 @@ Storage engine of all files
 """
 import json
 from models.base_model import BaseModel
+from models.user import User
+from model.state import State
+from model.city import City
+from model.amenity import Amenity
+from model.place import place
+from model.review import Review
 
 
 class FileStorage:
@@ -50,5 +56,6 @@ class FileStorage:
                     cls_name, obj_id = key.split('.')
                     cls = eval(cls_name)
                     self.new(cls(**value))
+
         except FileNotFoundError:
             return
