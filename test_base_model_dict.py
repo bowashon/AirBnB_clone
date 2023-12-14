@@ -22,3 +22,7 @@ print(type(my_new_model.created_at))
 
 print("--")
 print(my_model is my_new_model)
+
+bm1 = BaseModel()
+bm2 = BaseModel(**bm1.to_dict())
+print(bm1.id == bm2.id)
