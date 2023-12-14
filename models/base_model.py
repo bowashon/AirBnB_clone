@@ -26,6 +26,7 @@ class BaseModel():
                         self.__dict__[key] = datetime.strptime(value, t_fmt)
                     else:
                         self.__dict__[key] = value
+        models.storage.new(self)
 
     def __str__(self):
         """
@@ -40,6 +41,7 @@ class BaseModel():
         datetime
         """
         self.updated_at = datetime.today()
+        models.storage.save()
 
     def to_dict(self):
         """
