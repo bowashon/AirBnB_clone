@@ -19,14 +19,15 @@ class FileStorage():
         """
         returns the dictionary __objects
         """
-        return self.__objects
+        return FileStorage.__objects
 
     def new(self, obj):
         """
         sets in __objects the obj with key <obj class name>,id
         """
         obj_name = obj.__class__.__name__
-        self.__objects[obj_name] = obj
+        cls_name = "{}.{}".format(obj_name, obj.id)
+        FileStorage.__objects[cls_name] = obj
 
     def save(self):
         """
@@ -52,14 +53,14 @@ class FileStorage():
 
             try:
                 deserialized_file = json.load(f)
-
-                if deserialized_file is None:
-                    return
-
-                for key, value in deserialized_file.items():
-                    obj_name, obj_id = key.split('.')
-                    my_obj = eval(obj_name)
-                    cls_instance = my_obj(**value)
-                    FileStorage.__objects[key] = cls_instance
-            except Exception:
+            except json.JSONDecodeError:
                 pass
+
+            if deserialized_file is None:
+                return
+
+            for key, value in deserialized_file.items():
+                obj_name, obj_id = key.split('.')
+                my_obj = eval(obj_name)
+                cls_instance = my_obj(**value)
+                FileStorage.__objects[key] = cls_instance
