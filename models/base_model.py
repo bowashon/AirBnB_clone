@@ -11,10 +11,16 @@ class BaseModel():
     """
     class BaseModel as a base model for all classes
     """
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         instantiate the class BaseModel
         """
+        if kwargs:
+            for key, value in kwargs.items():
+                if key != '__class__':
+                    if isinstance(value, datetime):
+                        value = datetime.fromisoformat(value)
+                    setattr(self, key, value)
         self.id = str(uuid.uuid4())
         self.created_at = datetime.today()
         self.updated_at = datetime.today()
