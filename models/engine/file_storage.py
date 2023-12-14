@@ -5,11 +5,11 @@ Storage engine of all files
 import json
 from models.base_model import BaseModel
 from models.user import User
-from model.state import State
-from model.city import City
-from model.amenity import Amenity
-from model.place import place
-from model.review import Review
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class FileStorage:
