@@ -114,7 +114,7 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 0:
             print("** class name missing **")
         elif args[0] not in _classes:
-            print("** class doesn't exit **")
+            print("** class doesn't exist **")
         elif len(args) < 2:
             print("** instance id missing **")
         else:
@@ -134,9 +134,9 @@ class HBNBCommand(cmd.Cmd):
         args = shlex.split(arg)
 
         if not args:
-            print("**class name missing **")
+            print("** class name missing **")
         elif args[0] not in _classes:
-            print("** class doesn't exit **")
+            print("** class doesn't exist **")
         elif len(args) < 2:
             print("** instance id missing **")
         else:
