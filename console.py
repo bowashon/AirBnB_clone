@@ -27,27 +27,29 @@ _classes = {
         'Review': Review,
         }
 
+
 def parse_update(attr):
-        match_str = re.search(r"\{(.*?)\}", attr)
-        if match_str:
-            class_id = shlex.split(attr[:match_str.span()[0]])
-            new_id = [_.strip(',') for _ in class_id][0]
-            str_data = match_str.group(1)
-            try:
-                str_dict = ast.literal_eval("{" + str_data + "}")
-            except Exception:
-                return
-            print(str_dict)
-            return new_id, str_dict
-        else:
-            command = [_.strip() for _ in attr.split(',')]
-            try:
-                new_id = command[0]
-                attr_name = command[1]
-                attr_value = command[2]
-            except Exception:
-                return
-            return "{} {} {}".format(new_id, attr_name, attr_value)
+    match_str = re.search(r"\{(.*?)\}", attr)
+    if match_str:
+        class_id = shlex.split(attr[:match_str.span()[0]])
+        new_id = [_.strip(',') for _ in class_id][0]
+        str_data = match_str.group(1)
+        try:
+            str_dict = ast.literal_eval("{" + str_data + "}")
+        except Exception:
+            return
+        return new_id, str_dict
+
+    else:
+        command = [_.strip() for _ in attr.split(',')]
+        try:
+            new_id = command[0]
+            attr_name = command[1]
+            attr_value = command[2]
+        except Exception:
+            return
+        return "{} {} {}".format(new_id, attr_name, attr_value)
+
 
 class HBNBCommand(cmd.Cmd):
     """
@@ -233,7 +235,7 @@ class HBNBCommand(cmd.Cmd):
                     attr_name = key
                     attr_value = value
                     setattr(obj, attr_name, attr_value)
-            else:   
+            else:
                 attr_name = args[2]
                 attr_value = shlex.split(args[3])[0]
 
@@ -271,15 +273,16 @@ class HBNBCommand(cmd.Cmd):
                 attr = command[1].split(")")
                 new_id, class_args = parse_update(attr[0])
                 if isinstance(class_args, dict):
-                    update_str = " ".join(["{} {}".format(k, v) for k, v in class_args.items()])
-                    return_values = command_dict[command_method]("{} {} {}".format(
-                                                            class_name, new_id, update_str))
+                    return_values = command_dict[command_method](
+                            "{} {} {}".format(class_name, new_id, class_args))
                     return return_values
                 elif isinstance(class_args, str):
-                    return command_dict[command_method](" {} {} {} {}".format(class_name,
-                                                    new_id, attr_name, attr_value))
+                    return command_dict[command_method](
+                        "{} {} {} {}".format(
+                            class_name, new_id, attr_name, attr_value))
             else:
-                return command_dict[command_method](" {} {}".format(class_name, class_id))
+                return command_dict[command_method](
+                        " {} {}".format(class_name, class_id))
 
 
 if __name__ == '__main__':
