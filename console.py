@@ -4,16 +4,50 @@ The console or user interface of the program
 """
 import cmd
 import re
+import ast
 import shlex
 import json
 from models.base_model import BaseModel
 from models import storage
+from models.user import User
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
+from models.state import State
 
 
 _classes = {
-        'BaseModel': BaseModel
+        'BaseModel': BaseModel,
+        'User': User,
+        'City': City,
+        'Place': Place,
+        'State': State,
+        'Amenity': Amenity,
+        'Review': Review,
         }
 
+def parse_update(attr):
+        match_str = re.search(r"\{(.*?)\}", attr)
+        if match_str:
+            class_id = shlex.split(attr[:match_str.span()[0]])
+            new_id = [_.strip(',') for _ in class_id][0]
+            str_data = match_str.group(1)
+            try:
+                str_dict = ast.literal_eval("{" + str_data + "}")
+            except Exception:
+                return
+            print(str_dict)
+            return new_id, str_dict
+        else:
+            command = [_.strip() for _ in attr.split(',')]
+            try:
+                new_id = command[0]
+                attr_name = command[1]
+                attr_value = command[2]
+            except Exception:
+                return
+            return "{} {} {}".format(new_id, attr_name, attr_value)
 
 class HBNBCommand(cmd.Cmd):
     """
@@ -129,16 +163,33 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             for key, value in all_obj.items():
                 print(["{}".format(str(value))])
-                return
+            return
 
-        if args[0] not in _classes:
+        elif args[0] not in _classes:
             print("** class doesn't exist **")
             return
         else:
-            for value in all_obj.values():
-                if type(value).__name__ == args[0]:
+            for key, value in all_obj.items():
+                if key.split('.')[0] == args[0]:
                     print(str(value))
-                    return
+            return
+
+    def do_count(self, arg):
+        """
+        Count the number of instances created
+        """
+        args = shlex.split(arg)
+        if not args:
+            print("** class name missing **")
+        elif args[0] not in _classes:
+            print("** class doesn't exist **")
+        else:
+            all_objs = storage.all()
+            count = 0
+            for key in all_objs.keys():
+                if key.split('.')[0] == args[0]:
+                    count = count + 1
+            print(count)
 
     def do_update(self, arg):
         """
@@ -174,9 +225,17 @@ class HBNBCommand(cmd.Cmd):
             return
 
         else:
-
-            attr_name = args[2]
-            attr_value = shlex.split(args[3])[0]
+            match_str = re.search(r"\{(.*?)\}", arg)
+            if match_str:
+                data_str = match_str.group(1)
+                str_dict = ast.literal_eval("{" + data_str + "}")
+                for key, value in str_dict.items():
+                    attr_name = key
+                    attr_value = value
+                    setattr(obj, attr_name, attr_value)
+            else:   
+                attr_name = args[2]
+                attr_value = shlex.split(args[3])[0]
 
             if attr_name in ["id", "created_at", "updated_at"]:
                 return
@@ -188,6 +247,39 @@ class HBNBCommand(cmd.Cmd):
 
             setattr(obj, attr_name, attr_value)
             obj.save()
+
+    def default(self, arg):
+        """
+        Defines default that over writes the cmd default
+        """
+        args = arg.split('.')
+        class_name = args[0]
+        command = args[1].split("(")
+        command_method = command[0]
+        incoming_id = command[1].split(")")
+        class_id = incoming_id[0]
+
+        command_dict = {
+                'all': self.do_all,
+                'create': self.do_create,
+                'show': self.do_show,
+                'destroy': self.do_destroy,
+                'update': self.do_update,
+                'count': self.do_count}
+        if command_method in command_dict.keys():
+            if command_method == 'update':
+                attr = command[1].split(")")
+                new_id, class_args = parse_update(attr[0])
+                if isinstance(class_args, dict):
+                    update_str = " ".join(["{} {}".format(k, v) for k, v in class_args.items()])
+                    return_values = command_dict[command_method]("{} {} {}".format(
+                                                            class_name, new_id, update_str))
+                    return return_values
+                elif isinstance(class_args, str):
+                    return command_dict[command_method](" {} {} {} {}".format(class_name,
+                                                    new_id, attr_name, attr_value))
+            else:
+                return command_dict[command_method](" {} {}".format(class_name, class_id))
 
 
 if __name__ == '__main__':

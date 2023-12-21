@@ -5,6 +5,12 @@ file storage: serialization and deserialization of files
 from models.base_model import BaseModel
 import json
 import os
+from models.user import User
+from models.state import State
+from models.city import City
+from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
 
 
 class FileStorage():
@@ -45,7 +51,7 @@ class FileStorage():
         deserilizes the JSON file to __objects
         """
         if not os.path.exists(FileStorage.__file_path):
-            return
+         return
 
         deserialized_file = None
 
